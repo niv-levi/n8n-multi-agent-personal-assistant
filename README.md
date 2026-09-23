@@ -198,9 +198,27 @@ This version supports text commands through Telegram.
 
 Voice messages and additional integrations may be added in future versions.
 
+## Repository Contents
+
+```text
+.
+├── README.md
+├── .gitignore
+└── examples
+    ├── customer-sheet-template.csv
+    └── example-requests.md
+```
+
+The n8n workflow export and project screenshots will be added next.
+
 ## Screenshots
 
-Screenshots of the workflow and real Telegram examples will be added to the repository to show how the assistant works in practice.
+The repository will include:
+
+- Full n8n workflow overview
+- Telegram customer example
+- Telegram email example
+- Google Sheets customer table
 
 ## Project Goal
 
