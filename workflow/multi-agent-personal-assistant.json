@@ -1,0 +1,650 @@
+{
+  "name": "multi-agent-personal-assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        432,
+        -80
+      ],
+      "id": "c9389b28-98e9-4255-bcc6-8d8a555cb8a1",
+      "name": "Telegram Trigger"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.6-luna",
+          "mode": "list",
+          "cachedResultName": "gpt-5.6-luna"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        704,
+        -240
+      ],
+      "id": "83b5cf0e-dc66-4de6-b3fd-2e52b0705b91",
+      "name": "OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.chat.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        848,
+        -240
+      ],
+      "id": "347457a9-a250-47b8-8b99-dddd4ad58aa9",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.6-luna",
+          "mode": "list",
+          "cachedResultName": "gpt-5.6-luna"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        672,
+        384
+      ],
+      "id": "2bcc3802-a5e3-4997-98ac-fd4b64848feb",
+      "name": "OpenAI Chat Model1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.6-luna",
+          "mode": "list",
+          "cachedResultName": "gpt-5.6-luna"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        64,
+        368
+      ],
+      "id": "9d4b1024-3ca8-4652-b3a6-8a967ec2b0cd",
+      "name": "OpenAI Chat Model2"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.6-luna",
+          "mode": "list",
+          "cachedResultName": "gpt-5.6-luna"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1248,
+        400
+      ],
+      "id": "ca8cc8d3-0cc5-46b4-b3ca-3ae9b21a5083",
+      "name": "OpenAI Chat Model3"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "={{ `\nYou are the main orchestrator of a personal assistant.\n\nYour job is to understand the user's request and delegate it to the correct specialized agent.\n\nAvailable agents:\n\n- Email Agent:\n  Handles email-related requests, including creating email drafts and sending emails.\n\n- Calendar Agent:\n  Handles calendar-related requests, including checking existing events and creating new calendar events.\n\n- Customers Agent:\n  Handles customer-related requests in Google Sheets, including adding new customers, checking for duplicates, and retrieving existing customer information by name or order number.\n\nCurrent date and time:\n${$now.setZone('Asia/Jerusalem').toFormat('yyyy-MM-dd HH:mm:ss')}\n\nTimezone:\nAsia/Jerusalem\n\nRules:\n\n- Always use the appropriate specialized agent instead of performing the task yourself.\n- A single user request may require more than one agent.\n- If a request contains multiple actions, delegate each action to the relevant agent.\n- Use the current date and time above to understand relative dates such as today, tomorrow, next week, morning, afternoon, and evening.\n- When delegating a request with a relative date, include the exact calculated date in the request sent to the specialized agent.\n- When delegating to the Customers Agent, include the exact date if the user says \"today\".\n- Never invent missing information.\n- If a specialized agent needs essential information that the user did not provide, ask the user for it.\n- Do not claim that an action was completed unless the specialized agent confirms that it was completed.\n\nExamples:\n\nUser:\n\"Create a meeting tomorrow at 10:00\"\n\nAction:\nUse Calendar Agent.\n\nUser:\n\"Draft an email to Daniel\"\n\nAction:\nUse Email Agent.\n\nUser:\n\"Add customer Ron Levi with order number 3333\"\n\nAction:\nUse Customers Agent.\n\nUser:\n\"Create a meeting tomorrow at 10:00 and send Daniel an email about it\"\n\nAction:\nUse Calendar Agent and Email Agent.\n\nAfter all required agents finish, return a short and clear summary of what was done.\n` }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        672,
+        -80
+      ],
+      "id": "445a146b-98e4-49b5-8c5c-81d49a761827",
+      "name": "Manager Agent"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Handles email requests such as creating email drafts and sending emails.",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "You are an Email Agent.\n\nHandle only email-related requests.\n\nYou can:\n- Create email drafts.\n- Send emails when the user explicitly asks to send them.\n\nIf the user asks to write, prepare, or draft an email, create a draft only.\nIf essential information is missing, ask for it instead of guessing.\n\nReturn a short clear result to the Manager Agent."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 3,
+      "position": [
+        176,
+        208
+      ],
+      "id": "d99ef1db-deaf-4352-8001-640c1dfc7079",
+      "name": "Email Agent"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        288,
+        480
+      ],
+      "id": "68e428c2-cf95-4292-86aa-fa49dbb35f1c",
+      "name": "Send Email"
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        432,
+        480
+      ],
+      "id": "e5e0b09d-35b5-440c-a5b1-3f879d033c26",
+      "name": "Create Draft"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Handles calendar-related requests, including checking existing events and creating new calendar events.",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "You are a Calendar Agent.\n\nHandle only calendar-related requests.\n\nYou can:\n- Check existing calendar events.\n- Check the user's schedule.\n- Create new calendar events.\n\nRules:\n- Use the connected Google Calendar tools whenever required.\n- Never invent missing dates or times.\n- Use the exact date provided by the Manager Agent when the user refers to relative dates such as today or tomorrow.\n- If essential information is missing, ask for it instead of guessing.\n- Return a short and clear result to the Manager Agent."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 3,
+      "position": [
+        736,
+        208
+      ],
+      "id": "fc8e1daf-82be-4d02-8720-47a52360a7e7",
+      "name": "Calendar Agent"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "primary",
+          "mode": "list",
+          "cachedResultName": "Primary Calendar"
+        },
+        "limit": 20,
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('After', ``, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Before', ``, 'string') }}",
+        "options": {
+          "timeZone": {
+            "__rl": true,
+            "value": "Asia/Jerusalem",
+            "mode": "list",
+            "cachedResultName": "Asia/Jerusalem"
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        848,
+        464
+      ],
+      "id": "b3eed395-a0b4-41d4-a0ec-dd53b2b1ad45",
+      "name": "Get Events"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "primary",
+          "mode": "list",
+          "cachedResultName": "Primary Calendar"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        992,
+        464
+      ],
+      "id": "ffe6bf0a-02b6-4116-82b4-1634427b3bc5",
+      "name": "Create Event"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Handles customer management tasks in Google Sheets, including adding new customers, checking for duplicates, and retrieving existing customer information by name or order number.",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "You are a Customers Agent responsible for managing customer records in Google Sheets.\n\nThe Google Sheet contains these columns:\n\n1. תאריך\n2. שם לקוח\n3. מספר הזמנה\n4. קטגוריה\n5. שירות / בקשה\n6. סטטוס\n7. עדיפות\n8. תגיות\n9. הערות\n\nAvailable tools:\n- Find Customer: searches existing customer records by customer name and/or order number.\n- Add Customer: adds a new customer row.\n\nYour responsibilities:\n1. Add new customers.\n2. Check for duplicates before adding a customer.\n3. Retrieve customer information by name or order number.\n\nWhen adding a new customer:\n- Extract only information actually provided by the user.\n- Before adding anything, ALWAYS use Find Customer.\n- Search using the customer name and/or order number provided by the user.\n- If the same customer and order already exist, do not add another row.\n- If no duplicate exists, use Add Customer exactly once.\n\nWhen retrieving customer information:\n- Use Find Customer.\n- Return all available information from the matching row.\n- If multiple records are found, return them clearly.\n- If no matching record is found, say that no matching customer was found.\n- Do not invent missing information.\n- Do not add or modify anything unless the user explicitly asks to do so.\n\nWhen mapping a new customer to the sheet:\n- תאריך: Date only, formatted DD/MM/YYYY.\n- שם לקוח: Customer full name only.\n- מספר הזמנה: Order number only.\n- קטגוריה: One category only.\n- שירות / בקשה: Service or request description only.\n- סטטוס: Status only.\n- עדיפות: Priority only.\n- תגיות: Short comma-separated tags only.\n- הערות: Notes only.\n\nNever combine multiple fields into one column.\nIf a field was not provided and cannot be clearly inferred, leave it empty.\nNever invent missing information.\n\nAllowed categories:\n- אוטומציה\n- אתר\n- AI / בוט\n- אינטגרציה\n- ייעוץ\n- אוטומציה + אתר\n- אחר\n\nCategory and tags may be inferred only when clearly supported by the service description.\nIf the user says \"today\", use the exact date provided by the Manager Agent.\n\nAfter completing any action, return a short and clear result to the Manager Agent."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 3,
+      "position": [
+        1296,
+        208
+      ],
+      "id": "9a0d40b9-fc86-44b5-bf54-0165d84ba2bf",
+      "name": "Customers Agent"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "id",
+          "cachedResultName": "Customer Records"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "YOUR_SHEET_GID",
+          "mode": "id",
+          "cachedResultName": "Customers"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "מספר הזמנה",
+              "lookupValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('values0_Value', ``, 'string') }}"
+            },
+            {
+              "lookupColumn": "שם לקוח",
+              "lookupValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('values1_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        1472,
+        448
+      ],
+      "id": "72e9c66c-239a-4522-a4d7-a4bb8e7dc9e3",
+      "name": "Find Customer"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "id",
+          "cachedResultName": "Customer Records"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "YOUR_SHEET_GID",
+          "mode": "id",
+          "cachedResultName": "Customers"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "תאריך": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('_____', ``, 'string') }}",
+            "שם לקוח": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('_______', ``, 'string') }}",
+            "מספר הזמנה": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('__________', ``, 'string') }}",
+            "קטגוריה": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('_______', ``, 'string') }}",
+            "שירות / בקשה": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('____________', ``, 'string') }}",
+            "סטטוס": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('_____', ``, 'string') }}",
+            "עדיפות": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('______', ``, 'string') }}",
+            "תגיות": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('_____', ``, 'string') }}",
+            "הערות": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('_____', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "תאריך",
+              "displayName": "תאריך",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "שם לקוח",
+              "displayName": "שם לקוח",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "מספר הזמנה",
+              "displayName": "מספר הזמנה",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "קטגוריה",
+              "displayName": "קטגוריה",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "שירות / בקשה",
+              "displayName": "שירות / בקשה",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "סטטוס",
+              "displayName": "סטטוס",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "עדיפות",
+              "displayName": "עדיפות",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "תגיות",
+              "displayName": "תגיות",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "הערות",
+              "displayName": "הערות",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        1616,
+        448
+      ],
+      "id": "facae15a-9c0f-4f9f-95b8-77bb33141514",
+      "name": "Add Customer"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1040,
+        -80
+      ],
+      "id": "dab76ffe-c3f0-429f-b29b-32413244cdd7",
+      "name": "Telegram Reply"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Manager Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Manager Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Manager Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Calendar Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Customers Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manager Agent": {
+      "main": [
+        [
+          {
+            "node": "Telegram Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "Manager Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Draft": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calendar Agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "Manager Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Events": {
+      "ai_tool": [
+        [
+          {
+            "node": "Calendar Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Event": {
+      "ai_tool": [
+        [
+          {
+            "node": "Calendar Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Customers Agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "Manager Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Customer": {
+      "ai_tool": [
+        [
+          {
+            "node": "Customers Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Customer": {
+      "ai_tool": [
+        [
+          {
+            "node": "Customers Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "tags": []
+}
