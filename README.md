@@ -204,21 +204,39 @@ Voice messages and additional integrations may be added in future versions.
 .
 ├── README.md
 ├── .gitignore
-└── examples
-    ├── customer-sheet-template.csv
-    └── example-requests.md
+├── workflow
+│   └── multi-agent-personal-assistant.json
+├── examples
+│   ├── customer-sheet-template.csv
+│   └── example-requests.md
+└── screenshots
+    └── project screenshots
 ```
-
-The n8n workflow export and project screenshots will be added next.
 
 ## Screenshots
 
-The repository will include:
+### Workflow Overview
 
-- Full n8n workflow overview
-- Telegram customer example
-- Telegram email example
-- Google Sheets customer table
+The Manager Agent receives Telegram messages and routes each request to the Email Agent, Calendar Agent, or Customers Agent.
+
+![n8n multi-agent workflow](screenshots/%D7%A6%D7%99%D7%9C%D7%95%D7%9D%20%D7%9E%D7%A1%D7%9A%202026-09-23%20%D7%91-10.42.26.png)
+
+### Telegram Examples
+
+Real examples of sending simple requests to the assistant and receiving the result back in Telegram.
+
+<table>
+  <tr>
+    <td width="50%"><img src="screenshots/%D7%A6%D7%99%D7%9C%D7%95%D7%9D%20%D7%9E%D7%A1%D7%9A%202026-09-23%20%D7%91-10.32.21.png" alt="Telegram assistant example 1"></td>
+    <td width="50%"><img src="screenshots/%D7%A6%D7%99%D7%9C%D7%95%D7%9D%20%D7%9E%D7%A1%D7%9A%202026-09-23%20%D7%91-10.32.24.png" alt="Telegram assistant example 2"></td>
+  </tr>
+</table>
+
+### Customer Records in Google Sheets
+
+Customer information is stored in a structured Google Sheet that the Customers Agent can search and update.
+
+![Google Sheets customer records](screenshots/%D7%A6%D7%99%D7%9C%D7%95%D7%9D%20%D7%9E%D7%A1%D7%9A%202026-09-23%20%D7%91-10.42.12.png)
 
 ## Project Goal
 
