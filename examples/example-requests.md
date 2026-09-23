@@ -1,6 +1,6 @@
 # Example Requests
 
-These are examples of the natural language requests the assistant can handle through Telegram.
+These are example Telegram messages that the assistant can handle.
 
 ## Calendar
 
@@ -29,15 +29,5 @@ Add a new customer named Ron Levi, order number 3333, for website and automation
 ```
 
 ```text
-Show me all the details for customer Ron Levi.
+Show me the details for customer Ron Levi.
 ```
-
-## Multiple Agents
-
-A single Telegram message can require more than one agent.
-
-```text
-Create a meeting tomorrow at 10:00 and send Daniel an email about it.
-```
-
-The Manager Agent can route the calendar action to the Calendar Agent and the email action to the Email Agent.
