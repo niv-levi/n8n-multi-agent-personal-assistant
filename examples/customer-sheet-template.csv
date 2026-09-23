@@ -1,0 +1,4 @@
+Date,Customer Name,Order Number,Category,Service / Request,Status,Priority,Tags,Notes
+18/09/2026,Dana Cohen,3301,Automation,Lead automation,In Progress,Medium,"Leads, Automation",Waiting for approval
+20/09/2026,Itay Levi,3314,Website,Website development,New,Medium,"Website, Design",
+21/09/2026,Noa Israeli,AI / Bot,3322,Customer service bot,Completed,Low,"AI, Customer Service",Delivered to customer
